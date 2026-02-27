@@ -553,7 +553,7 @@ export default function DecisionAssistant() {
               )}
             </CardContent>
           </Card>
-        )
+        )}
         {/* 角色状态卡片 */}
         {(isRunning || progress > 0) && (
           <Card className={`mb-6 ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
