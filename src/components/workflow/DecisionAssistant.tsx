@@ -553,7 +553,80 @@ export default function DecisionAssistant() {
               )}
             </CardContent>
           </Card>
+        )
+        {/* 角色状态卡片 */}
+        {(isRunning || progress > 0) && (
+          <Card className={`mb-6 ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
+            <CardHeader>
+              <CardTitle className={`flex items-center gap-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                <span>👥</span>
+                角色执行状态
+                <span className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>
+                  {Object.values(roleStatuses).filter(r => r.status === 'completed').length}/{ROLES.length} 完成
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {ROLES.map((role) => {
+                  const status = roleStatuses[role.id];
+                  const statusText = status?.status || 'pending';
+                  const statusColor = 
+                    statusText === 'completed' ? 'bg-green-500' :
+                    statusText === 'running' ? 'bg-blue-500 animate-pulse' :
+                    statusText === 'failed' ? 'bg-red-500' :
+                    statusText === 'skipped' ? 'bg-gray-400' :
+                    'bg-gray-300';
+                  
+                  return (
+                    <div 
+                      key={role.id}
+                      className={`relative p-3 rounded-lg border transition-all duration-300 ${
+                        isDark ? 'bg-slate-700 border-slate-600' : 'bg-slate-50 border-slate-200'
+                      } ${statusText === 'running' ? 'ring-2 ring-blue-400' : ''}`}
+                    >
+                      <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${statusColor}`} />
+                      <div className="flex flex-col items-center text-center">
+                        <span className="text-2xl mb-1">{role.icon}</span>
+                        <span className={`text-xs font-medium ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                          {role.name}
+                        </span>
+                        <span className={`text-xs mt-1 ${
+                          statusText === 'completed' ? 'text-green-500' :
+                          statusText === 'running' ? 'text-blue-500' :
+                          statusText === 'failed' ? 'text-red-500' :
+                          statusText === 'skipped' ? 'text-gray-400' :
+                          'text-gray-400'
+                        }`}>
+                          {statusText === 'completed' ? '✓ 完成' :
+                           statusText === 'running' ? '● 执行中' :
+                           statusText === 'failed' ? '✗ 失败' :
+                           statusText === 'skipped' ? '○ 跳过' :
+                           '○ 等待'}
+                        </span>
+                      </div>
+                      {status?.content && statusText !== 'pending' && (
+                        <div className={`mt-2 text-xs truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                          {status.content.slice(0, 30)}...
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {Object.values(roleStatuses).filter(r => r.status === 'skipped').length > 0 && (
+                <div className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-slate-700' : 'bg-slate-100'}`}>
+                  <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                    ⚠️ 以下角色未参与本次分析：
+                    {ROLES.filter(r => roleStatuses[r.id]?.status === 'skipped').map(r => r.name).join('、')}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
+
+}
 
         {/* 执行摘要 */}
         {executiveSummary && (
